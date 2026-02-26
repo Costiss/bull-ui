@@ -1,0 +1,33 @@
+{
+  "initialized": true,
+  "mode": "file-router",
+  "projectName": "bull-ui",
+  "typescript": true,
+  "tailwind": true,
+  "git": true,
+  "addOnOptions": {
+    "drizzle": {
+      "database": "postgresql"
+    }
+  },
+  "packageManager": "pnpm",
+  "install": true,
+  "includeExamples": true,
+  "envVarValues": {},
+  "version": 1,
+  "addOns": true,
+  "framework": "react-cra",
+  "chosenAddOns": [
+    "compiler",
+    "drizzle",
+    "shadcn",
+    "t3env",
+    "table",
+    "tRPC",
+    "store",
+    "tanstack-query",
+    "biome",
+    "nitro",
+    "better-auth"
+  ]
+}
