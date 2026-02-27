@@ -307,6 +307,7 @@ function InstanceDetails() {
 		return <div className="p-8 text-center">Unauthorized</div>;
 
 	if (selectedQueue) {
+		const queueName = selectedQueue;
 		return (
 			<div className="min-h-screen bg-background p-6 text-foreground md:p-12">
 				<div className="mx-auto max-w-6xl space-y-8">
@@ -440,7 +441,7 @@ function InstanceDetails() {
 						{selectedJobId && (
 							<JobDetails
 								instanceId={Number(id)}
-								queueName={selectedQueue!}
+								queueName={queueName}
 								jobId={selectedJobId}
 								onClose={() => setSelectedJobId(null)}
 							/>

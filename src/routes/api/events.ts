@@ -38,7 +38,7 @@ export const Route = createFileRoute("/api/events")({
 				const stream = new ReadableStream({
 					async start(controller) {
 						const encoder = new TextEncoder();
-						const sendEvent = (data: any) => {
+						const sendEvent = (data: Record<string, unknown>) => {
 							try {
 								controller.enqueue(
 									encoder.encode(`data: ${JSON.stringify(data)}\n\n`),
