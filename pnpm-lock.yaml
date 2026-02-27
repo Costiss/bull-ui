@@ -51,7 +51,7 @@ importers:
         specifier: ^1.132.0
         version: 1.163.2(@tanstack/react-router@1.163.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(vite@7.3.1(@types/node@22.19.13)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0))
       '@tanstack/store':
-        specifier: ^0.8.0
+        specifier: ^0.8.1
         version: 0.8.1
       '@trpc/client':
         specifier: ^11.4.3
