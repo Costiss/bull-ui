@@ -12,9 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InstancesIdRouteImport } from './routes/instances.$id'
 import { Route as ApiEventsRouteImport } from './routes/api/events'
+import { Route as InstancesIdIndexRouteImport } from './routes/instances.$id.index'
 import { Route as InstancesIdWorkersRouteImport } from './routes/instances.$id.workers'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api.trpc.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as InstancesIdQueuesQueueRouteImport } from './routes/instances.$id.queues.$queue'
+import { Route as InstancesIdQueuesQueueJobsJobIdRouteImport } from './routes/instances.$id.queues.$queue.jobs.$jobId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -31,6 +34,11 @@ const ApiEventsRoute = ApiEventsRouteImport.update({
   path: '/api/events',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InstancesIdIndexRoute = InstancesIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => InstancesIdRoute,
+} as any)
 const InstancesIdWorkersRoute = InstancesIdWorkersRouteImport.update({
   id: '/workers',
   path: '/workers',
@@ -46,6 +54,17 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InstancesIdQueuesQueueRoute = InstancesIdQueuesQueueRouteImport.update({
+  id: '/queues/$queue',
+  path: '/queues/$queue',
+  getParentRoute: () => InstancesIdRoute,
+} as any)
+const InstancesIdQueuesQueueJobsJobIdRoute =
+  InstancesIdQueuesQueueJobsJobIdRouteImport.update({
+    id: '/jobs/$jobId',
+    path: '/jobs/$jobId',
+    getParentRoute: () => InstancesIdQueuesQueueRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,14 +73,19 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/instances/$id/workers': typeof InstancesIdWorkersRoute
+  '/instances/$id/': typeof InstancesIdIndexRoute
+  '/instances/$id/queues/$queue': typeof InstancesIdQueuesQueueRouteWithChildren
+  '/instances/$id/queues/$queue/jobs/$jobId': typeof InstancesIdQueuesQueueJobsJobIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/events': typeof ApiEventsRoute
-  '/instances/$id': typeof InstancesIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/instances/$id/workers': typeof InstancesIdWorkersRoute
+  '/instances/$id': typeof InstancesIdIndexRoute
+  '/instances/$id/queues/$queue': typeof InstancesIdQueuesQueueRouteWithChildren
+  '/instances/$id/queues/$queue/jobs/$jobId': typeof InstancesIdQueuesQueueJobsJobIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +95,9 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/instances/$id/workers': typeof InstancesIdWorkersRoute
+  '/instances/$id/': typeof InstancesIdIndexRoute
+  '/instances/$id/queues/$queue': typeof InstancesIdQueuesQueueRouteWithChildren
+  '/instances/$id/queues/$queue/jobs/$jobId': typeof InstancesIdQueuesQueueJobsJobIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,14 +108,19 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/trpc/$'
     | '/instances/$id/workers'
+    | '/instances/$id/'
+    | '/instances/$id/queues/$queue'
+    | '/instances/$id/queues/$queue/jobs/$jobId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/api/events'
-    | '/instances/$id'
     | '/api/auth/$'
     | '/api/trpc/$'
     | '/instances/$id/workers'
+    | '/instances/$id'
+    | '/instances/$id/queues/$queue'
+    | '/instances/$id/queues/$queue/jobs/$jobId'
   id:
     | '__root__'
     | '/'
@@ -97,6 +129,9 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/trpc/$'
     | '/instances/$id/workers'
+    | '/instances/$id/'
+    | '/instances/$id/queues/$queue'
+    | '/instances/$id/queues/$queue/jobs/$jobId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -130,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiEventsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/instances/$id/': {
+      id: '/instances/$id/'
+      path: '/'
+      fullPath: '/instances/$id/'
+      preLoaderRoute: typeof InstancesIdIndexRouteImport
+      parentRoute: typeof InstancesIdRoute
+    }
     '/instances/$id/workers': {
       id: '/instances/$id/workers'
       path: '/workers'
@@ -151,15 +193,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/instances/$id/queues/$queue': {
+      id: '/instances/$id/queues/$queue'
+      path: '/queues/$queue'
+      fullPath: '/instances/$id/queues/$queue'
+      preLoaderRoute: typeof InstancesIdQueuesQueueRouteImport
+      parentRoute: typeof InstancesIdRoute
+    }
+    '/instances/$id/queues/$queue/jobs/$jobId': {
+      id: '/instances/$id/queues/$queue/jobs/$jobId'
+      path: '/jobs/$jobId'
+      fullPath: '/instances/$id/queues/$queue/jobs/$jobId'
+      preLoaderRoute: typeof InstancesIdQueuesQueueJobsJobIdRouteImport
+      parentRoute: typeof InstancesIdQueuesQueueRoute
+    }
   }
 }
 
+interface InstancesIdQueuesQueueRouteChildren {
+  InstancesIdQueuesQueueJobsJobIdRoute: typeof InstancesIdQueuesQueueJobsJobIdRoute
+}
+
+const InstancesIdQueuesQueueRouteChildren: InstancesIdQueuesQueueRouteChildren =
+  {
+    InstancesIdQueuesQueueJobsJobIdRoute: InstancesIdQueuesQueueJobsJobIdRoute,
+  }
+
+const InstancesIdQueuesQueueRouteWithChildren =
+  InstancesIdQueuesQueueRoute._addFileChildren(
+    InstancesIdQueuesQueueRouteChildren,
+  )
+
 interface InstancesIdRouteChildren {
   InstancesIdWorkersRoute: typeof InstancesIdWorkersRoute
+  InstancesIdIndexRoute: typeof InstancesIdIndexRoute
+  InstancesIdQueuesQueueRoute: typeof InstancesIdQueuesQueueRouteWithChildren
 }
 
 const InstancesIdRouteChildren: InstancesIdRouteChildren = {
   InstancesIdWorkersRoute: InstancesIdWorkersRoute,
+  InstancesIdIndexRoute: InstancesIdIndexRoute,
+  InstancesIdQueuesQueueRoute: InstancesIdQueuesQueueRouteWithChildren,
 }
 
 const InstancesIdRouteWithChildren = InstancesIdRoute._addFileChildren(
