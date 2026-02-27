@@ -29,3 +29,15 @@ export const authedProcedure = t.procedure.use(({ ctx, next }) => {
 		},
 	});
 });
+
+export const adminProcedure = authedProcedure.use(({ ctx, next }) => {
+	if (ctx.user.role !== "admin") {
+		throw new TRPCError({
+			code: "FORBIDDEN",
+			message: "Admin role required",
+		});
+	}
+	return next({ ctx });
+});
+
+export const viewerProcedure = authedProcedure;

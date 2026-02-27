@@ -17,5 +17,14 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: true,
 	},
+	user: {
+		additionalFields: {
+			role: {
+				type: "string",
+				defaultValue: "viewer",
+				input: false, // Don't allow users to set their role during sign up
+			},
+		},
+	},
 	plugins: [tanstackStartCookies()],
 });

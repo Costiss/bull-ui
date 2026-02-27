@@ -4,15 +4,15 @@ import { z } from "zod";
 import { db } from "../../db/index";
 import { redisInstances } from "../../db/schema";
 import { closeRedisConnection, getRedisConnection } from "../../lib/bullmq";
-import { authedProcedure } from "./init";
+import { adminProcedure, viewerProcedure } from "./init";
 
 export const redisRouter = {
-	list: authedProcedure.query(async ({ ctx }) => {
+	list: viewerProcedure.query(async ({ ctx }) => {
 		return await db.query.redisInstances.findMany({
 			where: (table, { eq }) => eq(table.userId, ctx.user.id),
 		});
 	}),
-	add: authedProcedure
+	add: adminProcedure
 		.input(
 			z.object({
 				name: z.string(),
@@ -30,7 +30,7 @@ export const redisRouter = {
 				.returning();
 			return instance;
 		}),
-	delete: authedProcedure
+	delete: adminProcedure
 		.input(z.object({ id: z.number() }))
 		.mutation(async ({ input, ctx }) => {
 			await db
@@ -48,7 +48,7 @@ export const redisRouter = {
 };
 
 export const bullmqRouter = {
-	getQueues: authedProcedure
+	getQueues: viewerProcedure
 		.input(z.object({ instanceId: z.number() }))
 		.query(async ({ input, ctx }) => {
 			const instance = await db.query.redisInstances.findFirst({
@@ -102,7 +102,7 @@ export const bullmqRouter = {
 			return queuesInfo;
 		}),
 
-	getJobs: authedProcedure
+	getJobs: viewerProcedure
 		.input(
 			z.object({
 				instanceId: z.number(),
@@ -154,7 +154,7 @@ export const bullmqRouter = {
 			return jobSummaries;
 		}),
 
-	getJob: authedProcedure
+	getJob: viewerProcedure
 		.input(
 			z.object({
 				instanceId: z.number(),
@@ -203,7 +203,7 @@ export const bullmqRouter = {
 			return jobDetails;
 		}),
 
-	controlQueue: authedProcedure
+	controlQueue: adminProcedure
 		.input(
 			z.object({
 				instanceId: z.number(),
@@ -234,7 +234,7 @@ export const bullmqRouter = {
 			return { success: true };
 		}),
 
-	removeJob: authedProcedure
+	removeJob: adminProcedure
 		.input(
 			z.object({
 				instanceId: z.number(),
@@ -266,7 +266,7 @@ export const bullmqRouter = {
 			return { success: true };
 		}),
 
-	retryJob: authedProcedure
+	retryJob: adminProcedure
 		.input(
 			z.object({
 				instanceId: z.number(),
@@ -298,7 +298,7 @@ export const bullmqRouter = {
 			return { success: true };
 		}),
 
-	getWorkers: authedProcedure
+	getWorkers: viewerProcedure
 		.input(
 			z.object({
 				instanceId: z.number(),
