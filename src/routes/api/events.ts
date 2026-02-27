@@ -43,7 +43,7 @@ export const Route = createFileRoute("/api/events")({
 								controller.enqueue(
 									encoder.encode(`data: ${JSON.stringify(data)}\n\n`),
 								);
-							} catch (e) {
+							} catch (_e) {
 								// Controller might be closed
 							}
 						};
@@ -100,7 +100,7 @@ export const Route = createFileRoute("/api/events")({
 							clearInterval(interval);
 							try {
 								controller.close();
-							} catch (e) {}
+							} catch (_e) {}
 						});
 					},
 				});
