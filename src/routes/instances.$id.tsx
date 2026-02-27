@@ -67,11 +67,13 @@ function JobDetails({
 	instanceId,
 	queueName,
 	jobId,
+	isAdmin,
 	onClose,
 }: {
 	instanceId: number;
 	queueName: string;
 	jobId: string;
+	isAdmin: boolean;
 	onClose: () => void;
 }) {
 	const { trpc, queryClient } = getContext();
@@ -213,26 +215,30 @@ function JobDetails({
 				</div>
 			</ScrollArea>
 			<div className="p-6 border-t bg-muted/20 flex gap-3">
-				<Button
-					variant="outline"
-					className="flex-1"
-					disabled={retryMutation.isPending}
-					onClick={() => retryMutation.mutate()}
-				>
-					<RotateCw
-						className={`mr-2 h-4 w-4 ${retryMutation.isPending ? "animate-spin" : ""}`}
-					/>
-					Retry
-				</Button>
-				<Button
-					variant="destructive"
-					className="flex-1"
-					disabled={removeMutation.isPending}
-					onClick={() => removeMutation.mutate()}
-				>
-					<Trash2 className="mr-2 h-4 w-4" />
-					Remove
-				</Button>
+				{isAdmin && (
+					<>
+						<Button
+							variant="outline"
+							className="flex-1"
+							disabled={retryMutation.isPending}
+							onClick={() => retryMutation.mutate()}
+						>
+							<RotateCw
+								className={`mr-2 h-4 w-4 ${retryMutation.isPending ? "animate-spin" : ""}`}
+							/>
+							Retry
+						</Button>
+						<Button
+							variant="destructive"
+							className="flex-1"
+							disabled={removeMutation.isPending}
+							onClick={() => removeMutation.mutate()}
+						>
+							<Trash2 className="mr-2 h-4 w-4" />
+							Remove
+						</Button>
+					</>
+				)}
 			</div>
 		</div>
 	);
@@ -241,6 +247,7 @@ function JobDetails({
 function InstanceDetails() {
 	const { id } = Route.useParams();
 	const { data: session } = authClient.useSession();
+	const isAdmin = session?.user.role === "admin";
 	const { trpc, queryClient } = getContext();
 	const navigate = useNavigate();
 
@@ -443,6 +450,7 @@ function InstanceDetails() {
 								instanceId={Number(id)}
 								queueName={queueName}
 								jobId={selectedJobId}
+								isAdmin={isAdmin}
 								onClose={() => setSelectedJobId(null)}
 							/>
 						)}
@@ -510,38 +518,40 @@ function InstanceDetails() {
 											)}
 										</CardDescription>
 									</div>
-									<div className="flex gap-1">
-										<Button
-											variant="ghost"
-											size="icon"
-											title={queue.isPaused ? "Resume" : "Pause"}
-											onClick={() =>
-												setConfirmAction({
-													queueName: queue.name,
-													action: queue.isPaused ? "resume" : "pause",
-												})
-											}
-										>
-											{queue.isPaused ? (
-												<Play className="h-4 w-4" />
-											) : (
-												<Pause className="h-4 w-4" />
-											)}
-										</Button>
-										<Button
-											variant="ghost"
-											size="icon"
-											title="Clean Completed"
-											onClick={() =>
-												setConfirmAction({
-													queueName: queue.name,
-													action: "clean",
-												})
-											}
-										>
-											<Trash2 className="h-4 w-4" />
-										</Button>
-									</div>
+									{isAdmin && (
+										<div className="flex gap-1">
+											<Button
+												variant="ghost"
+												size="icon"
+												title={queue.isPaused ? "Resume" : "Pause"}
+												onClick={() =>
+													setConfirmAction({
+														queueName: queue.name,
+														action: queue.isPaused ? "resume" : "pause",
+													})
+												}
+											>
+												{queue.isPaused ? (
+													<Play className="h-4 w-4" />
+												) : (
+													<Pause className="h-4 w-4" />
+												)}
+											</Button>
+											<Button
+												variant="ghost"
+												size="icon"
+												title="Clean Completed"
+												onClick={() =>
+													setConfirmAction({
+														queueName: queue.name,
+														action: "clean",
+													})
+												}
+											>
+												<Trash2 className="h-4 w-4" />
+											</Button>
+										</div>
+									)}
 								</CardHeader>
 								<CardContent className="space-y-4 pt-4">
 									<div className="grid grid-cols-2 gap-4">

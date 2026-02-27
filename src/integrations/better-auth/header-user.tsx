@@ -1,14 +1,21 @@
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { LogIn, LogOut, User as UserIcon } from "lucide-react";
 import { Badge } from "src/components/ui/badge";
 import { Button } from "src/components/ui/button";
 import { Skeleton } from "src/components/ui/skeleton";
 import { authClient } from "../../lib/auth-client";
+import { useTRPC } from "../trpc/react";
 
 export default function BetterAuthHeader() {
 	const { data: session, isPending } = authClient.useSession();
+	const trpc = useTRPC();
 
-	if (isPending) {
+	const { data: isInitialSetup, isLoading: isSetupLoading } = useQuery(
+		trpc.setup.isInitialSetup.queryOptions(),
+	);
+
+	if (isPending || isSetupLoading) {
 		return <Skeleton className="h-9 w-24 rounded-md" />;
 	}
 
@@ -23,7 +30,7 @@ export default function BetterAuthHeader() {
 						variant="outline"
 						className="text-[10px] h-4 px-1 font-mono uppercase text-muted-foreground mt-1"
 					>
-						{(session.user as { role?: string }).role || "user"}
+						{session.user.role || "user"}
 					</Badge>
 				</div>
 				<div className="h-8 w-8 rounded-full border bg-muted flex items-center justify-center overflow-hidden">
@@ -50,6 +57,10 @@ export default function BetterAuthHeader() {
 				</Button>
 			</div>
 		);
+	}
+
+	if (isInitialSetup) {
+		return null;
 	}
 
 	return (
