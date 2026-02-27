@@ -25,25 +25,25 @@ import {
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
-} from "#/components/ui/alert-dialog";
-import { Badge } from "#/components/ui/badge";
-import { Button } from "#/components/ui/button";
+} from "src/components/ui/alert-dialog";
+import { Badge } from "src/components/ui/badge";
+import { Button } from "src/components/ui/button";
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "#/components/ui/card";
-import { ScrollArea } from "#/components/ui/scroll-area";
+} from "src/components/ui/card";
+import { ScrollArea } from "src/components/ui/scroll-area";
 import {
 	Sheet,
 	SheetContent,
 	SheetDescription,
 	SheetHeader,
 	SheetTitle,
-} from "#/components/ui/sheet";
-import { Skeleton } from "#/components/ui/skeleton";
+} from "src/components/ui/sheet";
+import { Skeleton } from "src/components/ui/skeleton";
 import {
 	Table,
 	TableBody,
@@ -51,8 +51,8 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from "#/components/ui/table";
-import { Tabs, TabsList, TabsTrigger } from "#/components/ui/tabs";
+} from "src/components/ui/table";
+import { Tabs, TabsList, TabsTrigger } from "src/components/ui/tabs";
 import {
 	getContext,
 	trpcClient,

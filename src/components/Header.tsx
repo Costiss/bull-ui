@@ -1,14 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { Home, Menu } from "lucide-react";
 import { useState } from "react";
-import { Button } from "#/components/ui/button";
+import { Button } from "src/components/ui/button";
 import {
 	Sheet,
 	SheetContent,
 	SheetHeader,
 	SheetTitle,
 	SheetTrigger,
-} from "#/components/ui/sheet";
+} from "src/components/ui/sheet";
 import BetterAuthHeader from "../integrations/better-auth/header-user.tsx";
 
 export default function Header() {

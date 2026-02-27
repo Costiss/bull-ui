@@ -65,16 +65,16 @@ This project uses **Biome** for linting, formatting, and import organization.
   - Utilities/Hooks: `camelCase` (e.g., `useAuth.ts`, `utils.ts`)
   - Files: Match the primary export.
 - **Imports**:
-  - Use the `#/*` alias for `src/*` (configured in `package.json` imports).
+  - Use the `src/*` alias for `src/*` (configured in `package.json` imports).
   - Biome automatically organizes imports.
-  - Grouping: External libraries first, then internal aliases (`#/*`), then relative paths.
+  - Grouping: External libraries first, then internal aliases (`src/*`), then relative paths.
 
 ### Styling
 
 - Use **Tailwind CSS** classes.
-- Use the `cn()` utility from `#/*lib/utils` for conditional class merging:
+- Use the `cn()` utility from `src/*lib/utils` for conditional class merging:
   ```tsx
-  import { cn } from "#/lib/utils";
+  import { cn } from "src/lib/utils";
   <div className={cn("base-class", isActive && "active-class")} />;
   ```
 

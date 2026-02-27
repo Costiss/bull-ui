@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Queue } from "bullmq";
-import { db } from "#/db/index";
-import { auth } from "#/lib/auth";
-import { getRedisConnection } from "#/lib/bullmq";
+import { db } from "src/db/index";
+import { auth } from "src/lib/auth";
+import { getRedisConnection } from "src/lib/bullmq";
 
 export const Route = createFileRoute("/api/events")({
 	server: {

@@ -2,16 +2,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ExternalLink, Plus, Server, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { Badge } from "#/components/ui/badge";
-import { Button } from "#/components/ui/button";
+import { Badge } from "src/components/ui/badge";
+import { Button } from "src/components/ui/button";
 import {
 	Card,
 	CardContent,
 	CardFooter,
 	CardHeader,
 	CardTitle,
-} from "#/components/ui/card";
-import { Input } from "#/components/ui/input";
+} from "src/components/ui/card";
+import { Input } from "src/components/ui/input";
 import { useTRPC } from "../integrations/trpc/react";
 import { authClient } from "../lib/auth-client";
 

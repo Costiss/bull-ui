@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { LogIn, LogOut, User as UserIcon } from "lucide-react";
-import { Badge } from "#/components/ui/badge";
-import { Button } from "#/components/ui/button";
-import { Skeleton } from "#/components/ui/skeleton";
+import { Badge } from "src/components/ui/badge";
+import { Button } from "src/components/ui/button";
+import { Skeleton } from "src/components/ui/skeleton";
 import { authClient } from "../../lib/auth-client";
 
 export default function BetterAuthHeader() {
