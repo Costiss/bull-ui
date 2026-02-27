@@ -53,8 +53,9 @@ This project uses **Biome** for linting, formatting, and import organization.
 - **Database**: Drizzle ORM (PostgreSQL)
 - **Styling**: Tailwind CSS 4, Lucide React icons
 - **Schema Validation**: Zod
-- **UI/Component Library**: Shadcn UI
+- **UI/Component Library**: Shadcn UI (Use MCP when available)
 - **User Authentication**: BetterAuth (NextAuth.js alternative)
+- Use Playwright MCP if available for testing UI componens. Never install playwright directly in the project.
 
 ### General Guidelines
 
