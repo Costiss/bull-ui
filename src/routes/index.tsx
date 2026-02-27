@@ -2,6 +2,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ExternalLink, Plus, Server, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { Badge } from "#/components/ui/badge";
+import { Button } from "#/components/ui/button";
+import {
+	Card,
+	CardContent,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "#/components/ui/card";
+import { Input } from "#/components/ui/input";
 import { useTRPC } from "../integrations/trpc/react";
 import { authClient } from "../lib/auth-client";
 
@@ -41,19 +51,25 @@ function App() {
 	const [newPort, setNewPort] = useState(6379);
 
 	if (isSessionPending)
-		return <div className="p-8 text-center text-white">Loading...</div>;
+		return (
+			<div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+				<p className="animate-pulse text-lg">Loading...</p>
+			</div>
+		);
 
 	if (!session?.user) {
 		return (
-			<div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 text-white text-center">
-				<div className="max-w-md w-full space-y-8 bg-slate-800 p-8 rounded-xl border border-slate-700">
-					<h1 className="text-3xl font-bold">BullMQ UI</h1>
-					<p className="text-slate-400">
-						Please sign in to manage your queues.
-					</p>
-					<div className="space-y-4">
-						<button
-							type="button"
+			<div className="flex min-h-screen items-center justify-center bg-background p-6 text-foreground">
+				<Card className="w-full max-w-md border-border bg-card shadow-lg">
+					<CardHeader className="text-center">
+						<CardTitle className="text-3xl font-bold">BullMQ UI</CardTitle>
+						<p className="text-sm text-muted-foreground">
+							Please sign in to manage your queues.
+						</p>
+					</CardHeader>
+					<CardContent className="space-y-4">
+						<Button
+							className="w-full"
 							onClick={async () => {
 								await authClient.signIn.email(
 									{
@@ -72,89 +88,91 @@ function App() {
 									},
 								);
 							}}
-							className="w-full py-2 bg-cyan-600 hover:bg-cyan-500 rounded font-bold transition-colors"
 						>
 							Demo Login (demo@example.com)
-						</button>
-					</div>
-				</div>
+						</Button>
+					</CardContent>
+				</Card>
 			</div>
 		);
 	}
 
 	return (
-		<div className="min-h-screen bg-slate-900 text-white p-6 md:p-12">
-			<div className="max-w-5xl mx-auto space-y-8">
-				<header className="flex justify-between items-center">
-					<h1 className="text-3xl font-bold">Redis Instances</h1>
+		<div className="min-h-screen bg-background p-6 text-foreground md:p-12">
+			<div className="mx-auto max-w-5xl space-y-8">
+				<header className="flex items-center justify-between">
+					<h1 className="text-3xl font-bold tracking-tight">Redis Instances</h1>
 					<div className="flex items-center gap-4">
-						<span className="text-slate-400">Hi, {session.user.name}</span>
+						<Badge variant="outline" className="px-3 py-1">
+							Hi, {session.user.name}
+						</Badge>
 					</div>
 				</header>
 
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+				<div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 					{instances?.map((instance) => (
-						<div
+						<Card
 							key={instance.id}
-							className="bg-slate-800 border border-slate-700 rounded-xl p-6 space-y-4 hover:border-cyan-500/50 transition-all shadow-xl"
+							className="overflow-hidden transition-all hover:border-primary/50"
 						>
-							<div className="flex justify-between items-start">
-								<div className="p-3 bg-slate-700 rounded-lg">
-									<Server className="text-cyan-400" size={24} />
+							<CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
+								<div className="rounded-lg bg-muted p-2">
+									<Server className="h-5 w-5 text-primary" />
 								</div>
-								<button
-									type="button"
+								<Button
+									variant="ghost"
+									size="icon"
+									className="text-muted-foreground hover:text-destructive"
 									onClick={() => deleteInstance.mutate({ id: instance.id })}
-									className="text-slate-500 hover:text-red-400 transition-colors"
 								>
-									<Trash2 size={18} />
-								</button>
-							</div>
-							<div>
-								<h3 className="text-xl font-bold">{instance.name}</h3>
-								<p className="text-slate-400 text-sm font-mono">
+									<Trash2 className="h-4 w-4" />
+								</Button>
+							</CardHeader>
+							<CardContent>
+								<CardTitle className="text-xl">{instance.name}</CardTitle>
+								<p className="text-sm font-mono text-muted-foreground">
 									{instance.host}:{instance.port}
 								</p>
-							</div>
-							<Link
-								to="/instances/$id"
-								params={{ id: instance.id.toString() }}
-								className="flex items-center justify-center gap-2 w-full py-2 bg-slate-700 hover:bg-slate-600 rounded font-medium transition-colors mt-4"
-							>
-								Explore Queues <ExternalLink size={16} />
-							</Link>
-						</div>
+							</CardContent>
+							<CardFooter>
+								<Button asChild className="w-full" variant="secondary">
+									<Link
+										to="/instances/$id"
+										params={{ id: instance.id.toString() }}
+									>
+										Explore Queues <ExternalLink className="ml-2 h-4 w-4" />
+									</Link>
+								</Button>
+							</CardFooter>
+						</Card>
 					))}
 
-					<div className="bg-slate-800/50 border-2 border-dashed border-slate-700 rounded-xl p-6 flex flex-col items-center justify-center space-y-4 min-h-[200px]">
-						<Plus className="text-slate-500" size={32} />
-						<div className="space-y-3 w-full">
-							<input
-								type="text"
+					<Card className="flex min-h-[200px] flex-col items-center justify-center border-2 border-dashed bg-muted/50 p-6">
+						<Plus className="mb-4 h-8 w-8 text-muted-foreground" />
+						<div className="w-full space-y-3">
+							<Input
 								placeholder="Instance Name"
-								className="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-cyan-500"
 								value={newName}
 								onChange={(e) => setNewName(e.target.value)}
 							/>
 							<div className="flex gap-2">
-								<input
-									type="text"
+								<Input
 									placeholder="Host"
-									className="flex-1 bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-cyan-500"
+									className="flex-1"
 									value={newHost}
 									onChange={(e) => setNewHost(e.target.value)}
 								/>
-								<input
+								<Input
 									type="number"
 									placeholder="Port"
-									className="w-24 bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-cyan-500"
+									className="w-24"
 									value={newPort}
 									onChange={(e) => setNewPort(Number(e.target.value))}
 								/>
 							</div>
-							<button
-								type="button"
-								disabled={!newName || !newHost}
+							<Button
+								className="w-full"
+								disabled={!newName || !newHost || addInstance.isPending}
 								onClick={() => {
 									addInstance.mutate({
 										name: newName,
@@ -163,12 +181,11 @@ function App() {
 									});
 									setNewName("");
 								}}
-								className="w-full py-2 bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed rounded font-bold transition-colors"
 							>
-								Add Instance
-							</button>
+								{addInstance.isPending ? "Adding..." : "Add Instance"}
+							</Button>
 						</div>
-					</div>
+					</Card>
 				</div>
 			</div>
 		</div>
