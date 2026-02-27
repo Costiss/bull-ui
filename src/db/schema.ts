@@ -13,6 +13,7 @@ export const users = pgTable("user", {
 	email: text().notNull().unique(),
 	emailVerified: boolean().notNull(),
 	image: text(),
+	role: text().default("viewer"),
 	createdAt: timestamp().notNull(),
 	updatedAt: timestamp().notNull(),
 });

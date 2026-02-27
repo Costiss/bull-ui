@@ -36,14 +36,14 @@ Phase 2 — Database & Auth (high priority)
 - Task: Integrate BetterAuth (or chosen auth) to handle login, registration, session management. Implement role support (admin, viewer). (2d)
   - Acceptance: Users can log in; API endpoints respect roles.
 
-Phase 3 — Core Frontend (high priority) - IN PROGRESS
+Phase 3 — Core Frontend (high priority) - DONE
 
 - Task: Implement authentication flows (login/logout, session persistence). (1d)
 - Task: Create dashboard: instance selector, queue list for selected instance, queue detail page showing recent jobs and stats. (3d)
   - Acceptance: Dashboard shows queues and counts; clicking queue opens job list and details.
 - Task: Implement queue actions in UI (pause/resume/clean) with confirmation modals. (1.5d)
 
-Phase 4 — Real-time & Worker View (medium priority)
+Phase 4 — Real-time & Worker View (medium priority) - IN PROGRESS
 
 - Task: Add SSE-based updates for queue metrics and job events. Backend emits updates per instance and queue. (2d)
   - Acceptance: Dashboard metrics update in <5s without refresh.

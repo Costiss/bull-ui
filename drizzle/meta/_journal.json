@@ -8,6 +8,13 @@
       "when": 1772151265981,
       "tag": "0000_violet_captain_stacy",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1772154657728,
+      "tag": "0001_illegal_polaris",
+      "breakpoints": true
     }
   ]
 }

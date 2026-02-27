@@ -92,7 +92,10 @@ function WorkersPage() {
 											<TableCell className="font-medium">
 												{worker.name || "Unnamed"}
 											</TableCell>
-											<TableCell>{worker.opts?.concurrency || 1}</TableCell>
+											<TableCell>
+												{(worker.opts as { concurrency?: number })
+													?.concurrency || 1}
+											</TableCell>
 											<TableCell>
 												<Badge
 													variant="secondary"

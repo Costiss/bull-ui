@@ -23,7 +23,7 @@ export default function BetterAuthHeader() {
 						variant="outline"
 						className="text-[10px] h-4 px-1 font-mono uppercase text-muted-foreground mt-1"
 					>
-						{session.user.role || "user"}
+						{(session.user as { role?: string }).role || "user"}
 					</Badge>
 				</div>
 				<div className="h-8 w-8 rounded-full border bg-muted flex items-center justify-center overflow-hidden">
