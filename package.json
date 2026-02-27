@@ -18,7 +18,8 @@
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "mocks": "node bullmq/index.js"
   },
   "dependencies": {
     "@faker-js/faker": "^10.0.0",
