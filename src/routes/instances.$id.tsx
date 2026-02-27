@@ -15,7 +15,7 @@ import {
 	Users,
 	XCircle,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -260,6 +260,24 @@ function InstanceDetails() {
 		refetch: refetchQueues,
 		isRefetching: isQueuesRefetching,
 	} = useQuery(trpc.bullmq.getQueues.queryOptions({ instanceId: Number(id) }));
+
+	useEffect(() => {
+		const eventSource = new EventSource(`/api/events?instanceId=${id}`);
+		eventSource.onmessage = (event) => {
+			try {
+				const data = JSON.parse(event.data);
+				if (data.type === "metrics") {
+					queryClient.setQueryData(
+						trpc.bullmq.getQueues.queryKey({ instanceId: Number(id) }),
+						data.queues,
+					);
+				}
+			} catch (error) {
+				console.error("Error parsing SSE data:", error);
+			}
+		};
+		return () => eventSource.close();
+	}, [id, queryClient, trpc.bullmq.getQueues]);
 
 	const { data: jobs, isLoading: isJobsLoading } = useQuery({
 		...trpc.bullmq.getJobs.queryOptions({

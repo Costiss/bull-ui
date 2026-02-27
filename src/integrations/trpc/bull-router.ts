@@ -1,22 +1,10 @@
 import { Queue } from "bullmq";
 import { and, eq } from "drizzle-orm";
-import IORedis from "ioredis";
 import { z } from "zod";
 import { db } from "../../db/index";
 import { redisInstances } from "../../db/schema";
+import { closeRedisConnection, getRedisConnection } from "../../lib/bullmq";
 import { authedProcedure } from "./init";
-
-// Cache connections
-const connections: Record<number, IORedis> = {};
-
-function getRedisConnection(instanceId: number, host: string, port: number) {
-	if (!connections[instanceId]) {
-		connections[instanceId] = new IORedis(port, host, {
-			maxRetriesPerRequest: null,
-		});
-	}
-	return connections[instanceId];
-}
 
 export const redisRouter = {
 	list: authedProcedure.query(async ({ ctx }) => {
@@ -54,10 +42,7 @@ export const redisRouter = {
 					),
 				);
 
-			if (connections[input.id]) {
-				connections[input.id].disconnect();
-				delete connections[input.id];
-			}
+			closeRedisConnection(input.id);
 			return { success: true };
 		}),
 };
