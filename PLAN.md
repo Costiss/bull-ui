@@ -43,11 +43,13 @@ Phase 3 — Core Frontend (high priority) - DONE
   - Acceptance: Dashboard shows queues and counts; clicking queue opens job list and details.
 - Task: Implement queue actions in UI (pause/resume/clean) with confirmation modals. (1.5d)
 
-Phase 4 — Real-time & Worker View (medium priority) - IN PROGRESS
+Phase 4 — Real-time & Worker View (medium priority) - DONE
 
 - Task: Add SSE-based updates for queue metrics and job events. Backend emits updates per instance and queue. (2d)
   - Acceptance: Dashboard metrics update in <5s without refresh.
 - Task: Add worker list and worker controls (if applicable): view worker status, active jobs, kill/stop worker (where supported). (2d)
+
+- Implementation notes: SSE endpoint implemented at `src/routes/api/events.ts` (emits metrics every 5s); worker listing and UI are implemented in `src/routes/instances.$id.workers.tsx` and `src/routes/instances.$id.tsx`.
 
 Phase 5 — Multi-Redis Management & Persistence (medium priority)
 
@@ -55,22 +57,22 @@ Phase 5 — Multi-Redis Management & Persistence (medium priority)
 - Task: Backend: persist connections and reconnect strategy; allow per-instance logs and health check. (1.5d)
   - Note: Do NOT implement Redis AUTH now — leave fields in DB but ignore for connection.
 
-Phase 6 — Monitoring, Logging, and Auditing (medium priority)
-
-- Task: Add server-side audit table for user actions (who paused queue, when). Expose audit via API. (1d)
-- Task: Add basic metrics endpoint (Prometheus-friendly) for queue counts and errors. (1d)
-
-Phase 7 — Testing, Validation & Hardening (high priority)
+Phase 6 — Testing, Validation & Hardening (high priority)
 
 - Task: Add unit tests for backend services (BullMQ connector, connection manager) and tRPC endpoints. (2d)
 - Task: Add integration tests for key user flows (login, view queues, pause/resume). (2d)
 - Task: Run accessibility checks on major pages and fix issues. (1d)
 
-Phase 8 — CI, Release & Docs (medium priority)
+Phase 7 — CI, Release & Docs (medium priority)
 
 - Task: Wire up CI to run: lint, format, typecheck, tests. (0.5d)
 - Task: Write user docs for connecting Redis instances, common troubleshooting. (1d)
 - Task: Create release checklist and deployment scripts (Dockerfile, deployment notes). (1d)
+
+Phase 8 — Monitoring, Logging, and Auditing (medium priority)
+
+- Task: Add server-side audit table for user actions (who paused queue, when). Expose audit via API. (1d)
+- Task: Add basic metrics endpoint (Prometheus-friendly) for queue counts and errors. (1d)
 
 Nice-to-have / Future (low priority)
 
