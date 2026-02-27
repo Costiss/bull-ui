@@ -1,88 +1,49 @@
-Welcome to Bull UI — a web-based control plane for BullMQ queues and workers.
+Bull UI — Simple, friendly dashboard for BullMQ
 
-This repository scaffolds a TanStack Start frontend and a Node backend to manage multiple BullMQ/Redis instances. The project follows a small vertical-slices approach: get a minimal, secure, end-to-end flow working early (list queues, view jobs, basic controls), then iterate toward real-time updates, multi-instance management, and observability.
+Bull UI is a lightweight, open-source web dashboard for viewing and managing BullMQ queues, jobs, and workers across one or more Redis instances. This README focuses on how to run and use the application — developer notes are kept compact and separate.
 
-Key project documents:
+Why use Bull UI
 
-- `PLAN.md` - project roadmap and phased implementation plan.
-- `CONTRIBUTING.md` - contribution guidelines (if present).
+- Inspect queues and jobs quickly — status, payload, attempts, timestamps
+- Control jobs and queues — retry, remove, pause/resume (role checks apply)
+- Connect multiple Redis/BullMQ instances and switch between them
+- Small, focused surface: built for operators who want fast visibility and simple controls
 
-Getting started
-
-- Install dependencies and start the dev server:
-
-```bash
-pnpm install
-pnpm dev
-```
-
-- Build for production:
+Build and run (example):
 
 ```bash
-pnpm build
+docker build -t bull-ui:latest .
+docker run -it --rm -p 3000:3000 \
+  -e BETTER_AUTH_SECRET="<your-secret-at-least-32-chars>" \
+  -e DATABASE_URL="postgres://user:pass@db:5432/bulldb" \
+  bull-ui:latest
 ```
 
-- Run tests (Vitest):
+Notes on Docker env vars
 
-```bash
-pnpm test
-```
+- BETTER_AUTH_SECRET — required for auth; use a strong secret (>= 32 characters)
+- BETTER_AUTH_URL — recommended for production. This is the base URL your users will be redirected to during auth flows (e.g. `https://app.example.com`). Set this environment variable to avoid mis-detected callback URLs and OAuth proxy issues.
+- DATABASE_URL — optional (Postgres) — when provided the app will persist users, instances, and audits. Format: `postgres://user:pass@host:port/dbname`
 
-Scripts and checks
+Redis configuration
 
-Use the repository scripts during development and for CI checks:
+Redis/BullMQ instances are configured inside the app (Instance selector). You cannot provide a single Redis connection via an environment variable — add one or more instances from the dashboard after the server is running.
 
-- `pnpm dev` — start dev server
-- `pnpm build` — production build
-- `pnpm test` — run tests
-- `pnpm lint` — run Biome linter
-- `pnpm format` — format code with Biome
-- `pnpm check` — lint + format checks
+Minimal environment variables reference
 
-Environment & auth
+- BETTER_AUTH_SECRET (required for production auth)
+- BETTER_AUTH_URL (recommended for production; base URL used for auth callbacks/redirects)
+- DATABASE_URL (optional, recommended for persistence)
+- PORT (optional, defaults to 3000)
 
-- Configure environment variables in `.env.local`. Example keys used by the project:
-  - `DATABASE_URL` — Postgres connection for persistence (users, instances, audits)
-  - `BETTER_AUTH_SECRET` — secret for BetterAuth sessions
+Using the app (user flow)
 
-- The app integrates with BetterAuth for authentication (optional). See `README.md` and `src/lib/auth.ts` for example setup and migrations.
+- Sign in (if auth enabled) or open the dashboard (dev mode may skip auth)
+- From the instance selector add a Redis/BullMQ instance (host, port, optional password)
+- Select a queue to view jobs, inspect payloads, and use controls (retry, promote, remove)
+- Visit the workers page to view worker processes and their status
 
-Architecture (high level)
+Security & operations
 
-- Frontend: React + TanStack Start + TanStack Router + Tailwind CSS + Shadcn UI
-- Backend: Node HTTP server with tRPC endpoints (auth, instances, queues, jobs, workers) and BullMQ connector managing multiple Redis instances
-- Database: Postgres (via Drizzle ORM suggested) for users, sessions, redis_instances, audits
-- Realtime: SSE initially for queue/job events; later consider HTTP/2 or WebSocket transports
-
-Roadmap highlights (see `PLAN.md` for details)
-
-- Phase 0: project setup, tooling, and docs
-- Phase 1: BullMQ connector + tRPC endpoints for listing queues and jobs, basic control endpoints (pause/resume, retry, remove)
-- Phase 2: Database + BetterAuth-based authentication and roles (admin/viewer)
-- Phase 3: Frontend dashboard, instance selector, queue/job views, auth flows (in progress)
-- Phase 4: SSE-based realtime updates and worker view
-- Phase 5: Persisted multi-Redis management and health checks
-- Phase 6: Auditing and Prometheus-friendly metrics
-
-Security & operational notes
-
-- All API endpoints require authentication; destructive operations require proper role checks and confirmation.
-- Rate-limit bulk/destructive endpoints and keep a configurable retention policy for displayed job payloads to avoid large blobs in the UI.
-
-Contributing & next steps
-
-- Follow the tasks in `PLAN.md` to create issues or cards for work items. Each task should include title, why/what, acceptance criteria, estimate, and priority.
-- Recommended next actions:
-  1. Implement Phase 0/Phase 1 vertical slice (getQueues, getJobs, basic UI) — this repo already includes `PLAN.md` and a running frontend scaffold.
-  2. Add DB migrations and BetterAuth integration for secured endpoints.
-
-If you'd like, I can create GitHub issues from `PLAN.md` or start implementing the Phase 0/Phase 1 vertical slice and open a PR. I will run `pnpm lint`, `pnpm format`, `pnpm check`, and `pnpm test` as requested when making changes.
-
-Where to look in the codebase
-
-- Frontend routes and components: `src/routes/`
-- Styles: `src/styles.css`
-- Backend server functions / API: `src/server/` (or `src/routes/api/` depending on structure)
-- Auth helpers: `src/lib/auth.ts`
-
-Thanks for starting this project — the PLAN.md contains a clear roadmap; this README emphasizes how to get started and where to focus next.
+- Always set `BETTER_AUTH_SECRET` to a secure, high-entropy value in production.
+- Run behind TLS (reverse proxy) and restrict access to the dashboard using network controls or auth providers.
