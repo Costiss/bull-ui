@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
 	Activity,
 	ArrowLeft,
@@ -170,9 +170,9 @@ function JobDetails({
 									No logs available
 								</span>
 							) : (
-								job.logs.map((log, i) => (
+								job.logs.map((log) => (
 									<div
-										key={i}
+										key={log}
 										className="border-b border-border/50 pb-1 last:border-0"
 									>
 										{log}
@@ -242,6 +242,7 @@ function InstanceDetails() {
 	const { id } = Route.useParams();
 	const { data: session } = authClient.useSession();
 	const { trpc, queryClient } = getContext();
+	const navigate = useNavigate();
 
 	const [selectedQueue, setSelectedQueue] = useState<string | null>(null);
 	const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
@@ -589,6 +590,20 @@ function InstanceDetails() {
 										>
 											Inspect Jobs
 										</Button>
+										{queue.workers.length > 0 && (
+											<Button
+												className="w-full mt-2"
+												variant="outline"
+												onClick={() =>
+													navigate({
+														to: "/instances/$id/workers",
+														params: { id },
+													})
+												}
+											>
+												View Workers
+											</Button>
+										)}
 									</div>
 								</CardContent>
 							</Card>

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InstancesIdRouteImport } from './routes/instances.$id'
 import { Route as ApiEventsRouteImport } from './routes/api/events'
+import { Route as InstancesIdWorkersRouteImport } from './routes/instances.$id.workers'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api.trpc.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
@@ -30,6 +31,11 @@ const ApiEventsRoute = ApiEventsRouteImport.update({
   path: '/api/events',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InstancesIdWorkersRoute = InstancesIdWorkersRouteImport.update({
+  id: '/workers',
+  path: '/workers',
+  getParentRoute: () => InstancesIdRoute,
+} as any)
 const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
   id: '/api/trpc/$',
   path: '/api/trpc/$',
@@ -44,24 +50,27 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/events': typeof ApiEventsRoute
-  '/instances/$id': typeof InstancesIdRoute
+  '/instances/$id': typeof InstancesIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/instances/$id/workers': typeof InstancesIdWorkersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/events': typeof ApiEventsRoute
-  '/instances/$id': typeof InstancesIdRoute
+  '/instances/$id': typeof InstancesIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/instances/$id/workers': typeof InstancesIdWorkersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/api/events': typeof ApiEventsRoute
-  '/instances/$id': typeof InstancesIdRoute
+  '/instances/$id': typeof InstancesIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/instances/$id/workers': typeof InstancesIdWorkersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -71,8 +80,15 @@ export interface FileRouteTypes {
     | '/instances/$id'
     | '/api/auth/$'
     | '/api/trpc/$'
+    | '/instances/$id/workers'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/events' | '/instances/$id' | '/api/auth/$' | '/api/trpc/$'
+  to:
+    | '/'
+    | '/api/events'
+    | '/instances/$id'
+    | '/api/auth/$'
+    | '/api/trpc/$'
+    | '/instances/$id/workers'
   id:
     | '__root__'
     | '/'
@@ -80,12 +96,13 @@ export interface FileRouteTypes {
     | '/instances/$id'
     | '/api/auth/$'
     | '/api/trpc/$'
+    | '/instances/$id/workers'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiEventsRoute: typeof ApiEventsRoute
-  InstancesIdRoute: typeof InstancesIdRoute
+  InstancesIdRoute: typeof InstancesIdRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiTrpcSplatRoute: typeof ApiTrpcSplatRoute
 }
@@ -113,6 +130,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiEventsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/instances/$id/workers': {
+      id: '/instances/$id/workers'
+      path: '/workers'
+      fullPath: '/instances/$id/workers'
+      preLoaderRoute: typeof InstancesIdWorkersRouteImport
+      parentRoute: typeof InstancesIdRoute
+    }
     '/api/trpc/$': {
       id: '/api/trpc/$'
       path: '/api/trpc/$'
@@ -130,10 +154,22 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface InstancesIdRouteChildren {
+  InstancesIdWorkersRoute: typeof InstancesIdWorkersRoute
+}
+
+const InstancesIdRouteChildren: InstancesIdRouteChildren = {
+  InstancesIdWorkersRoute: InstancesIdWorkersRoute,
+}
+
+const InstancesIdRouteWithChildren = InstancesIdRoute._addFileChildren(
+  InstancesIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiEventsRoute: ApiEventsRoute,
-  InstancesIdRoute: InstancesIdRoute,
+  InstancesIdRoute: InstancesIdRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiTrpcSplatRoute: ApiTrpcSplatRoute,
 }

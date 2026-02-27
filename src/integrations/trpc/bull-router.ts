@@ -297,4 +297,36 @@ export const bullmqRouter = {
 			await q.close();
 			return { success: true };
 		}),
+
+	getWorkers: authedProcedure
+		.input(
+			z.object({
+				instanceId: z.number(),
+				queueName: z.string(),
+			}),
+		)
+		.query(async ({ input, ctx }) => {
+			const instance = await db.query.redisInstances.findFirst({
+				where: (table, { eq, and }) =>
+					and(eq(table.id, input.instanceId), eq(table.userId, ctx.user.id)),
+			});
+
+			if (!instance) throw new Error("Instance not found");
+
+			const redis = getRedisConnection(
+				instance.id,
+				instance.host,
+				instance.port,
+			);
+			const q = new Queue(input.queueName, { connection: redis });
+
+			const workers = await q.getWorkers();
+
+			await q.close();
+			return workers.map((w) => ({
+				id: w.id,
+				name: w.name,
+				opts: w.opts,
+			}));
+		}),
 };
