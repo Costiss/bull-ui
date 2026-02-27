@@ -117,6 +117,107 @@ export const bullmqRouter = {
 			return queuesInfo;
 		}),
 
+	getJobs: authedProcedure
+		.input(
+			z.object({
+				instanceId: z.number(),
+				queueName: z.string(),
+				state: z
+					.enum(["active", "waiting", "completed", "failed", "delayed"])
+					.optional(),
+				limit: z.number().min(1).max(100).default(50),
+				offset: z.number().min(0).default(0),
+			}),
+		)
+		.query(async ({ input, ctx }) => {
+			const instance = await db.query.redisInstances.findFirst({
+				where: (table, { eq, and }) =>
+					and(eq(table.id, input.instanceId), eq(table.userId, ctx.user.id)),
+			});
+
+			if (!instance) throw new Error("Instance not found");
+
+			const redis = getRedisConnection(
+				instance.id,
+				instance.host,
+				instance.port,
+			);
+			const q = new Queue(input.queueName, { connection: redis });
+
+			const jobs = await q.getJobs(
+				input.state
+					? [input.state]
+					: ["active", "waiting", "completed", "failed", "delayed"],
+				input.offset,
+				input.offset + input.limit - 1,
+			);
+
+			const jobSummaries = jobs.map((job) => ({
+				id: job.id,
+				name: job.name,
+				data: job.data,
+				opts: job.opts,
+				progress: job.progress,
+				attemptsMade: job.attemptsMade,
+				finishedOn: job.finishedOn,
+				processedOn: job.processedOn,
+				failedReason: job.failedReason,
+				returnvalue: job.returnvalue,
+			}));
+
+			await q.close();
+			return jobSummaries;
+		}),
+
+	getJob: authedProcedure
+		.input(
+			z.object({
+				instanceId: z.number(),
+				queueName: z.string(),
+				jobId: z.string(),
+			}),
+		)
+		.query(async ({ input, ctx }) => {
+			const instance = await db.query.redisInstances.findFirst({
+				where: (table, { eq, and }) =>
+					and(eq(table.id, input.instanceId), eq(table.userId, ctx.user.id)),
+			});
+
+			if (!instance) throw new Error("Instance not found");
+
+			const redis = getRedisConnection(
+				instance.id,
+				instance.host,
+				instance.port,
+			);
+			const q = new Queue(input.queueName, { connection: redis });
+
+			const [job, logs] = await Promise.all([
+				q.getJob(input.jobId),
+				q.getJobLogs(input.jobId),
+			]);
+
+			if (!job) throw new Error("Job not found");
+
+			const jobDetails = {
+				id: job.id,
+				name: job.name,
+				data: job.data,
+				opts: job.opts,
+				progress: job.progress,
+				attemptsMade: job.attemptsMade,
+				finishedOn: job.finishedOn,
+				processedOn: job.processedOn,
+				failedReason: job.failedReason,
+				returnvalue: job.returnvalue,
+				stacktrace: job.stacktrace,
+				logs: logs.logs,
+			};
+
+			await q.close();
+			return jobDetails;
+		}),
+
 	controlQueue: authedProcedure
 		.input(
 			z.object({
@@ -143,6 +244,70 @@ export const bullmqRouter = {
 			if (input.action === "pause") await q.pause();
 			else if (input.action === "resume") await q.resume();
 			else if (input.action === "clean") await q.clean(0, 1000, "completed");
+
+			await q.close();
+			return { success: true };
+		}),
+
+	removeJob: authedProcedure
+		.input(
+			z.object({
+				instanceId: z.number(),
+				queueName: z.string(),
+				jobId: z.string(),
+			}),
+		)
+		.mutation(async ({ input, ctx }) => {
+			const instance = await db.query.redisInstances.findFirst({
+				where: (table, { eq, and }) =>
+					and(eq(table.id, input.instanceId), eq(table.userId, ctx.user.id)),
+			});
+
+			if (!instance) throw new Error("Instance not found");
+
+			const redis = getRedisConnection(
+				instance.id,
+				instance.host,
+				instance.port,
+			);
+			const q = new Queue(input.queueName, { connection: redis });
+
+			const job = await q.getJob(input.jobId);
+			if (job) {
+				await job.remove();
+			}
+
+			await q.close();
+			return { success: true };
+		}),
+
+	retryJob: authedProcedure
+		.input(
+			z.object({
+				instanceId: z.number(),
+				queueName: z.string(),
+				jobId: z.string(),
+			}),
+		)
+		.mutation(async ({ input, ctx }) => {
+			const instance = await db.query.redisInstances.findFirst({
+				where: (table, { eq, and }) =>
+					and(eq(table.id, input.instanceId), eq(table.userId, ctx.user.id)),
+			});
+
+			if (!instance) throw new Error("Instance not found");
+
+			const redis = getRedisConnection(
+				instance.id,
+				instance.host,
+				instance.port,
+			);
+			const q = new Queue(input.queueName, { connection: redis });
+
+			const job = await q.getJob(input.jobId);
+			if (job) {
+				await job.retry();
+			}
 
 			await q.close();
 			return { success: true };
