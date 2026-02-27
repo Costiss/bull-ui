@@ -36,7 +36,7 @@ Phase 2 — Database & Auth (high priority)
 - Task: Integrate BetterAuth (or chosen auth) to handle login, registration, session management. Implement role support (admin, viewer). (2d)
   - Acceptance: Users can log in; API endpoints respect roles.
 
-Phase 3 — Core Frontend (high priority)
+Phase 3 — Core Frontend (high priority) - IN PROGRESS
 
 - Task: Implement authentication flows (login/logout, session persistence). (1d)
 - Task: Create dashboard: instance selector, queue list for selected instance, queue detail page showing recent jobs and stats. (3d)
