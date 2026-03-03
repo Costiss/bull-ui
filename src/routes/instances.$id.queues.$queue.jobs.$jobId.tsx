@@ -2,7 +2,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { RotateCw, Trash2 } from "lucide-react";
 import { Button } from "src/components/ui/button";
-import { ScrollArea } from "src/components/ui/scroll-area";
 import {
 	Sheet,
 	SheetContent,
@@ -83,7 +82,7 @@ function JobDetailsRoute() {
 
 	return (
 		<Sheet open={true} onOpenChange={(open) => !open && handleClose()}>
-			<SheetContent className="w-full sm:max-w-xl p-0">
+			<SheetContent className="w-full sm:max-w-4xl p-0">
 				<SheetHeader className="p-6 border-b bg-muted/10">
 					<SheetTitle className="text-2xl font-bold flex items-center gap-2">
 						Job #{jobId}
