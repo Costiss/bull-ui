@@ -1,5 +1,6 @@
 import IORedis from "ioredis";
 import bullmqPkg from "bullmq";
+import { randomUUID } from "node:crypto";
 const { Queue, Worker, QueueScheduler } = bullmqPkg;
 
 const REDIS_HOST = process.env.REDIS_HOST || "127.0.0.1";
@@ -53,7 +54,8 @@ async function startMockQueue(name, workerCount = 1, addEveryMs = 3000) {
   // Periodically add jobs so the UI has something to show
   const interval = setInterval(async () => {
     try {
-      const job = await queue.add("task", { createdAt: Date.now() }, { removeOnComplete: 100 });
+        const name = randomUUID()
+      const job = await queue.add(name, { createdAt: Date.now() });
       console.log(`[${name}] Added job`, job.id);
     } catch (e) {
       console.error(`Failed to add job to ${name}:`, e);
