@@ -1,11 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import {
 	Activity,
 	ArrowLeft,
 	CheckCircle2,
 	Clock,
+	RotateCw,
 	Settings2,
+	Trash2,
 	XCircle,
 } from "lucide-react";
 import { useState } from "react";
@@ -20,7 +22,10 @@ import {
 	TableRow,
 } from "src/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "src/components/ui/tabs";
-import { getContext } from "../integrations/tanstack-query/root-provider";
+import {
+	getContext,
+	trpcClient,
+} from "../integrations/tanstack-query/root-provider";
 import { authClient } from "../lib/auth-client";
 
 export const Route = createFileRoute("/instances/$id/queues/$queue")({
@@ -30,7 +35,7 @@ export const Route = createFileRoute("/instances/$id/queues/$queue")({
 function QueueDetails() {
 	const { id, queue: queueName } = Route.useParams();
 	const { data: session } = authClient.useSession();
-	const { trpc } = getContext();
+	const { trpc, queryClient } = getContext();
 	const navigate = useNavigate();
 
 	const [jobState, setJobState] = useState<
@@ -43,6 +48,40 @@ function QueueDetails() {
 			queueName: queueName,
 			state: jobState,
 		}),
+	});
+
+	const retryMutation = useMutation({
+		mutationFn: ({ jobId }: { jobId: string }) =>
+			trpcClient.bullmq.retryJob.mutate({
+				instanceId: Number(id),
+				queueName: queueName,
+				jobId,
+			}),
+		onSuccess: () => {
+			queryClient.invalidateQueries(
+				trpc.bullmq.getJobs.queryFilter({
+					instanceId: Number(id),
+					queueName: queueName,
+				}),
+			);
+		},
+	});
+
+	const removeMutation = useMutation({
+		mutationFn: ({ jobId }: { jobId: string }) =>
+			trpcClient.bullmq.removeJob.mutate({
+				instanceId: Number(id),
+				queueName: queueName,
+				jobId,
+			}),
+		onSuccess: () => {
+			queryClient.invalidateQueries(
+				trpc.bullmq.getJobs.queryFilter({
+					instanceId: Number(id),
+					queueName: queueName,
+				}),
+			);
+		},
 	});
 
 	if (!session?.user)
@@ -113,7 +152,7 @@ function QueueDetails() {
 										<TableHead className="w-[100px]">ID</TableHead>
 										<TableHead>Name</TableHead>
 										<TableHead>Attempts</TableHead>
-										<TableHead>Progress</TableHead>
+										<TableHead>Priority</TableHead>
 										<TableHead className="text-right">Actions</TableHead>
 									</TableRow>
 								</TableHeader>
@@ -126,32 +165,59 @@ function QueueDetails() {
 											<TableCell className="font-medium">{job.name}</TableCell>
 											<TableCell>{job.attemptsMade}</TableCell>
 											<TableCell>
-												<div className="h-2 w-full max-w-[100px] overflow-hidden rounded-full bg-muted">
-													<div
-														className="h-full bg-primary"
-														style={{
-															width: `${typeof job.progress === "number" ? job.progress : 0}%`,
-														}}
-													/>
-												</div>
+												<span className="inline-block rounded px-2 py-1 text-xs font-mono bg-muted">
+													{typeof job.opts?.priority === "number"
+														? job.opts.priority
+														: "-"}
+												</span>
 											</TableCell>
 											<TableCell className="text-right">
-												<Button
-													variant="ghost"
-													size="sm"
-													onClick={() =>
-														navigate({
-															to: "/instances/$id/queues/$queue/jobs/$jobId",
-															params: {
-																id,
-																queue: queueName,
-																jobId: job.id || "",
-															},
-														})
-													}
-												>
-													Details
-												</Button>
+												<div className="flex items-center justify-end gap-2">
+													<Button
+														variant="ghost"
+														size="sm"
+														onClick={() =>
+															navigate({
+																to: "/instances/$id/queues/$queue/jobs/$jobId",
+																params: {
+																	id,
+																	queue: queueName,
+																	jobId: job.id || "",
+																},
+															})
+														}
+													>
+														Details
+													</Button>
+													{session?.user.role === "admin" && (
+														<>
+															<Button
+																variant="outline"
+																size="sm"
+																disabled={retryMutation.isPending}
+																onClick={() =>
+																	retryMutation.mutate({ jobId: job.id || "" })
+																}
+															>
+																<RotateCw
+																	className={`mr-2 h-4 w-4 ${retryMutation.isPending ? "animate-spin" : ""}`}
+																/>
+																Retry
+															</Button>
+															<Button
+																variant="destructive"
+																size="sm"
+																disabled={removeMutation.isPending}
+																onClick={() =>
+																	removeMutation.mutate({ jobId: job.id || "" })
+																}
+															>
+																<Trash2 className="mr-2 h-4 w-4" />
+																Remove
+															</Button>
+														</>
+													)}
+												</div>
 											</TableCell>
 										</TableRow>
 									))}
