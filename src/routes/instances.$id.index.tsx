@@ -41,7 +41,7 @@ function InstanceIndex() {
 
 	const [confirmAction, setConfirmAction] = useState<{
 		queueName: string;
-		action: "pause" | "resume" | "clean";
+		action: "pause" | "resume" | "clean" | "purge";
 	} | null>(null);
 
 	const {
@@ -73,7 +73,7 @@ function InstanceIndex() {
 		mutationFn: (input: {
 			instanceId: number;
 			queueName: string;
-			action: "pause" | "resume" | "clean";
+			action: "pause" | "resume" | "clean" | "purge";
 		}) => trpcClient.bullmq.controlQueue.mutate(input),
 		onSuccess: () => {
 			queryClient.invalidateQueries(
@@ -171,6 +171,20 @@ function InstanceIndex() {
 													setConfirmAction({
 														queueName: queue.name,
 														action: "clean",
+													})
+												}
+											>
+												<Trash2 className="h-4 w-4" />
+											</Button>
+											<Button
+												variant="ghost"
+												size="icon"
+												title="Purge All"
+												className="text-destructive"
+												onClick={() =>
+													setConfirmAction({
+														queueName: queue.name,
+														action: "purge",
 													})
 												}
 											>
@@ -276,8 +290,21 @@ function InstanceIndex() {
 						<AlertDialogDescription>
 							This will {confirmAction?.action} the queue{" "}
 							<strong>{confirmAction?.queueName}</strong>.
-							{confirmAction?.action === "clean" &&
-								" This action will remove all completed jobs from the queue."}
+							<br />
+							<br />
+							{confirmAction?.action === "clean" && (
+								<>
+									Clean will <strong>remove</strong> all{" "}
+									<strong>completed</strong> jobs from the queue.
+								</>
+							)}
+							{confirmAction?.action === "purge" && (
+								<>
+									Purge will <strong>💀obliterate💀</strong> the entire queue,
+									removing all jobs regardless of their state.{" "}
+									<strong>Use with caution! ⚠️</strong>
+								</>
+							)}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>

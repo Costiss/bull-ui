@@ -208,7 +208,7 @@ export const bullmqRouter = {
 			z.object({
 				instanceId: z.number(),
 				queueName: z.string(),
-				action: z.enum(["pause", "resume", "clean"]),
+				action: z.enum(["pause", "resume", "clean", "purge"]),
 			}),
 		)
 		.mutation(async ({ input, ctx }) => {
@@ -229,6 +229,7 @@ export const bullmqRouter = {
 			if (input.action === "pause") await q.pause();
 			else if (input.action === "resume") await q.resume();
 			else if (input.action === "clean") await q.clean(0, 1000, "completed");
+			else if (input.action === "purge") await q.obliterate({ force: true });
 
 			await q.close();
 			return { success: true };
