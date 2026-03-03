@@ -103,13 +103,13 @@ function JobDetailsRoute() {
 					<div className="p-4">Job not found</div>
 				) : (
 					<div className="flex flex-col h-full">
-						<ScrollArea className="flex-1">
+						<div className="flex-1">
 							<div className="space-y-6 p-6">
 								<div className="space-y-2">
 									<h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
 										Payload Data
 									</h3>
-									<pre className="p-4 rounded-md bg-muted font-mono text-xs overflow-auto max-h-[300px]">
+									<pre className="p-4 rounded-md bg-muted font-mono text-xs overflow-auto max-h-[300px] w-full max-w-full box-border whitespace-pre-wrap break-words break-all">
 										{JSON.stringify(job.data, null, 2)}
 									</pre>
 								</div>
@@ -119,7 +119,7 @@ function JobDetailsRoute() {
 										<h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
 											Return Value
 										</h3>
-										<pre className="p-4 rounded-md bg-muted font-mono text-xs overflow-auto max-h-[300px]">
+										<pre className="p-4 rounded-md bg-muted font-mono text-xs overflow-auto max-h-[300px] w-full max-w-full box-border whitespace-pre-wrap break-words break-all">
 											{JSON.stringify(job.returnvalue, null, 2)}
 										</pre>
 									</div>
@@ -141,7 +141,7 @@ function JobDetailsRoute() {
 										<h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
 											Stacktrace
 										</h3>
-										<pre className="p-4 rounded-md bg-muted font-mono text-xs overflow-auto">
+										<pre className="p-4 rounded-md bg-muted font-mono text-xs w-full max-w-full box-border whitespace-pre-wrap break-words overflow-auto max-h-[300px]">
 											{job.stacktrace.join("\n")}
 										</pre>
 									</div>
@@ -198,7 +198,7 @@ function JobDetailsRoute() {
 									</div>
 								</div>
 							</div>
-						</ScrollArea>
+						</div>
 						<div className="p-6 border-t bg-muted/20 flex gap-3">
 							{isAdmin && (
 								<>
